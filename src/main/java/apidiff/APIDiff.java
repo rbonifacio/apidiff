@@ -64,6 +64,29 @@ public class APIDiff implements DiffDetector{
 	}
 	
 	@Override
+	public Result detectChangeBetweenRevisions(String first, String second, Classifier classifierAPI) {
+		Result result = new Result();
+		try {
+			File projectFolder = new File(UtilTools.getPathProject(this.path, nameProject));		
+			GitService service = new GitServiceImpl();
+			Repository repository = service.openRepositoryAndCloneIfNotExists(this.path, this.nameProject, this.url);
+			RevCommit commitOne = service.createRevCommitByCommitId(repository, first);
+			RevCommit commitTwo = service.createRevCommitByCommitId(repository, second);
+			APIVersion version1 = this.getAPIVersionByCommit(commitOne.getName(), projectFolder, repository, commitTwo, classifierAPI);//old version
+			APIVersion version2 = this.getAPIVersionByCommit(commitTwo.getName(), projectFolder, repository, commitTwo, classifierAPI); //new version
+			DiffProcessor diff = new DiffProcessorImpl();
+			Result resultByClassifier = diff.detectChange(version1, version2, repository, commitTwo);			
+			result.getChangeType().addAll(resultByClassifier.getChangeType());
+			result.getChangeMethod().addAll(resultByClassifier.getChangeMethod());
+			result.getChangeField().addAll(resultByClassifier.getChangeField());
+		} catch (Exception e) {
+			this.logger.error("Error in calculating commitn diff ", e);
+		}
+		this.logger.info("Finished processing.");
+		return result;
+	}
+	
+	@Override
 	public Result detectChangeAllHistory(String branch, List<Classifier> classifiers) throws Exception {
 		Result result = new Result();
 		GitService service = new GitServiceImpl();

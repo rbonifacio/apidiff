@@ -16,6 +16,16 @@ public interface DiffDetector {
 	public Result detectChangeAtCommit(String commitId, Classifier classifier) throws Exception;
 	
 	/**
+	 * Analyzing changes between two specific commits
+	 * @param first - SHA key of the older commit
+	 * @param first - SHA key of the most recent commit
+	 * @param classifier - Classifier for packages
+	 * @return Result - Detected changes
+	 * @throws Exception - Exception during process
+	 */
+	public Result detectChangeBetweenRevisions(String first, String second, Classifier classifierAPI);
+	
+	/**
 	 * Analyzing changes performed in several commits
 	 * @param branch - branch name (i.e., "master")
 	 * @param classifiers - Classifier for packages
