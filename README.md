@@ -1,4 +1,4 @@
-This is a slight extension of the APIDiff library.
+This is a slight extension of the [APIDiff library](https://github.com/aserg-ufmg/apidiff).
 The main goal of this extension is to allow a researcher
 to compute the breaking changes between two revisions.
 The following test case explains how to use this
