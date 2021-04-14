@@ -33,7 +33,7 @@ public void testMethodBreakingChanges() {
 ```
 
 
-   * Note: this is a contribution of Francisco Handrick da Costa
+   * Note: this is a contribution from Francisco Handrick da Costa
    
 # APIDiff (original README file) 
 
