@@ -63,22 +63,34 @@ public class APIDiff implements DiffDetector{
 		return result;
 	}
 	
+	/**
+	 * Detects all changes between two revisions. 
+	 * 
+	 * @param newer the most recent commit id
+	 * @param older the early commit id
+	 * 
+	 * @return the list of changes of interest between two commits.
+	 * 
+	 * @author Francisco Handrick da Costa (https://github.com/FHandrick). 
+	 */
 	@Override
-	public Result detectChangeBetweenRevisions(String first, String second, Classifier classifierAPI) {
+	public Result detectChangeBetweenRevisions(String newer, String older, Classifier classifierAPI) {
 		Result result = new Result();
 		try {
-			File projectFolder = new File(UtilTools.getPathProject(this.path, nameProject));		
 			GitService service = new GitServiceImpl();
-			Repository repository = service.openRepositoryAndCloneIfNotExists(this.path, this.nameProject, this.url);
-			RevCommit commitOne = service.createRevCommitByCommitId(repository, first);
-			RevCommit commitTwo = service.createRevCommitByCommitId(repository, second);
-			APIVersion version1 = this.getAPIVersionByCommit(commitOne.getName(), projectFolder, repository, commitTwo, classifierAPI);//old version
-			APIVersion version2 = this.getAPIVersionByCommit(commitTwo.getName(), projectFolder, repository, commitTwo, classifierAPI); //new version
-			DiffProcessor diff = new DiffProcessorImpl();
-			Result resultByClassifier = diff.detectChange(version1, version2, repository, commitTwo);			
-			result.getChangeType().addAll(resultByClassifier.getChangeType());
-			result.getChangeMethod().addAll(resultByClassifier.getChangeMethod());
-			result.getChangeField().addAll(resultByClassifier.getChangeField());
+			
+			Repository repository = service.openRepositoryAndCloneIfNotExists(this.path, this.nameProject, this.url);		
+			RevWalk walk = service.createRevsWalkBetweenCommits(repository, newer, older);	
+			Iterator<RevCommit> i = walk.iterator();
+			while(i.hasNext()){
+				RevCommit currentCommit = i.next();
+				
+				Result resultByClassifier = this.diffCommit(currentCommit, repository, this.nameProject, classifierAPI);
+				result.getChangeType().addAll(resultByClassifier.getChangeType());
+				result.getChangeMethod().addAll(resultByClassifier.getChangeMethod());
+				result.getChangeField().addAll(resultByClassifier.getChangeField());
+			}
+						
 		} catch (Exception e) {
 			this.logger.error("Error in calculating commitn diff ", e);
 		}

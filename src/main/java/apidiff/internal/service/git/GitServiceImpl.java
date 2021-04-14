@@ -266,4 +266,21 @@ public class GitServiceImpl implements GitService {
 		walk.parseCommit(commit.getParent(0));
 		return commit;
 	}
+	
+	@Override
+	public RevWalk createRevsWalkBetweenCommits(Repository repository, String startCommitId, String endCommitId)
+			throws Exception {
+		RevWalk walk = new RevWalk(repository);
+		
+		ObjectId startCommit = repository.resolve(startCommitId);
+        walk.markStart(walk.parseCommit(startCommit));
+
+        if (endCommitId != null) {
+        		ObjectId endCommit = repository.resolve(endCommitId);  
+            walk.markUninteresting(walk.parseCommit(endCommit));
+        }
+		
+		walk.setRevFilter(commitsFilter);
+		return walk;
+	}
 }

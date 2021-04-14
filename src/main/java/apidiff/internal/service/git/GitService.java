@@ -23,4 +23,6 @@ public interface GitService {
 	RevCommit createRevCommitByCommitId(final Repository repository, final String commitId) throws Exception;
 	
 	public RevWalk createAllRevsWalk(Repository repository, String branch) throws Exception;
+
+	RevWalk createRevsWalkBetweenCommits(Repository repository, String older, String newer) throws Exception;
 }
