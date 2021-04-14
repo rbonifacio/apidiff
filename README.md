@@ -1,4 +1,41 @@
-# APIDiff
+This is a slight extension of the APIDiff library.
+The main goal of this extension is to allow a researcher
+to compute the breaking changes between two revisions.
+The following test case explains how to use this
+additional feature.
+
+```java
+@Test
+public void testMethodBreakingChanges() {
+  try {
+    String r1rv60 = "52b0902592e770b8116f80f2eab7a4048b589d7d"; // commit id for revision r1rv60
+    String r1rv59 = "6de1c17dda8ffdb19431ffcadbce1836867a27a9"; // commit id for revision r1rv59
+            
+    String out = getClass().getResource("/").getFile();
+            
+    APIDiff diff = new APIDiff("bc", "https://github.com/bcgit/bc-java.git");
+            
+    diff.setPath(out);
+            
+    Result res = diff.detectChangeBetweenRevisions(r1rv60, r1rv59, Classifier.API);
+            
+    long methodBreakingChanges = res.getChangeMethod().stream()
+                                         .filter(c -> c.isBreakingChange())
+                                         .count();
+            
+    Assert.assertEquals(40, methodBreakingChanges); // expecting 40 methodBreakingChanges
+            
+  }
+  catch(Exception ex) {
+     Assert.fail();
+  }
+}
+```
+
+
+   * Note: this is a contribution of Francisco Handrick da Costa
+   
+# APIDiff (original README file) 
 
 A tool to identify API breaking and non-breaking changes between two versions of a Java library. APIDiff analyses libraries hosted on the distributed version control system _git_.
 
